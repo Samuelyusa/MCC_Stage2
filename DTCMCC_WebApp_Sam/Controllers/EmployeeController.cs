@@ -1,92 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
-using System.Collections.Generic;
 using DTCMCC_WebApp_Sam.Models;
 using System;
+using DTCMCC_WebApp_Sam.Context;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace DTCMCC_WebApp_Sam.Controllers
 {
     public class EmployeeController : Controller
     {
-        SqlConnection sqlConnection;
-        string connectionString = "Data Source=DESKTOP-GK9TR5F;Initial Catalog=DTSMCC001;User ID=mccdts1;Password=mccdts;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        MyContext myContext;
+        public EmployeeController( MyContext myContext)
+        {
+            this.myContext = myContext;
+        }
 
         //Read
         public IActionResult Index()
         {
-            string query = "select * from Employees";
-
-            sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            
-            List<Employee> Employees = new List<Employee>();
-
-            try
-            {
-                sqlConnection.Open();
-                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-                {
-                    if (sqlDataReader.HasRows)
-                    {
-                        while (sqlDataReader.Read())
-                        {
-                            Employee employee = new Employee();
-                            employee.EmployeeId = Convert.ToInt32(sqlDataReader[0]);
-                            employee.FirstName = sqlDataReader[1].ToString();
-                            Employees.Add(employee);
-                        }
-                    }
-                    sqlDataReader.Close();
-                }
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException);
-            }
-
-            return View(Employees);
+            var data = myContext.Employees.Include(x => x.Department).Include(y => y.Jobs).ToList();
+            return View(data);
         }
 
         //Read By ID
         //GET
         public IActionResult Details(int Id, string FirstName)
         {
-            string query = "select * from employees where EmployeeId = @EmployeeId";
+            //string query = "select * from employees where EmployeeId = @EmployeeId";
 
-            SqlParameter sqlParameter = new SqlParameter();
-            sqlParameter.ParameterName = "@EmployeeId";
-            sqlParameter.Value = Id;
+            //SqlParameter sqlParameter = new SqlParameter();
+            //sqlParameter.ParameterName = "@EmployeeId";
+            //sqlParameter.Value = Id;
 
-            sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            sqlCommand.Parameters.Add(sqlParameter);
+            //sqlConnection = new SqlConnection(connectionString);
+            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
+            //sqlCommand.Parameters.Add(sqlParameter);
 
-            try
-            {
-                sqlConnection.Open();
-                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-                {
-                    if (sqlDataReader.HasRows)
-                    {
-                        while (sqlDataReader.Read())
-                        {
-                            ViewData["EmployeeId"] = sqlDataReader[0];
-                            ViewData["FirstName"] = sqlDataReader[1];
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No Data Rows");
-                    }
-                    sqlDataReader.Close();
-                }
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException);
-            }
+            //try
+            //{
+            //    sqlConnection.Open();
+            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+            //    {
+            //        if (sqlDataReader.HasRows)
+            //        {
+            //            while (sqlDataReader.Read())
+            //            {
+            //                ViewData["EmployeeId"] = sqlDataReader[0];
+            //                ViewData["FirstName"] = sqlDataReader[1];
+            //            }
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("No Data Rows");
+            //        }
+            //        sqlDataReader.Close();
+            //    }
+            //    sqlConnection.Close();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.InnerException);
+            //}
 
             return View();
         }
@@ -96,28 +71,28 @@ namespace DTCMCC_WebApp_Sam.Controllers
         public IActionResult Create()
         {
            
-            string data_length = "SELECT COUNT(EmployeeId) FROM Employees";
-            int count = 0;
+            //string data_length = "SELECT COUNT(EmployeeId) FROM Employees";
+            //int count = 0;
 
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    using (SqlCommand dataCount = new SqlCommand(data_length, sqlConnection))
-                    {
-                        sqlConnection.Open();
-                        count = (int)dataCount.ExecuteScalar();
-                    }
+            //using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            //{
+            //    try
+            //    {
+            //        using (SqlCommand dataCount = new SqlCommand(data_length, sqlConnection))
+            //        {
+            //            sqlConnection.Open();
+            //            count = (int)dataCount.ExecuteScalar();
+            //        }
 
-                    ViewData["EmployeeId"] = count + 1;
+            //        ViewData["EmployeeId"] = count + 1;
 
-                    sqlConnection.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.InnerException);
-                }
-            }
+            //        sqlConnection.Close();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine(ex.InnerException);
+            //    }
+            //}
             return View();
         } 
        
@@ -127,79 +102,54 @@ namespace DTCMCC_WebApp_Sam.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Employee employee)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            if (ModelState.IsValid)
             {
-                sqlConnection.Open();
-                SqlTransaction sqlTransaction = sqlConnection.BeginTransaction();
-
-                SqlCommand sqlCommand = sqlConnection.CreateCommand();
-                sqlCommand.Transaction = sqlTransaction;
-
-                try
-                {
-                    sqlCommand.CommandText = "INSERT INTO Employees " +
-                        "(EmployeeID, FirstName) VALUES (@EmployeeId, @FirstName) ";
-
-                    SqlParameter sqlParameterId = new SqlParameter();
-                    sqlParameterId.ParameterName = "@EmployeeId";
-                    sqlParameterId.Value = employee.EmployeeId;
-
-                    SqlParameter sqlParameter = new SqlParameter();
-                    sqlParameter.ParameterName = "@FirstName";
-                    sqlParameter.Value = employee.FirstName;
-
-                    sqlCommand.Parameters.Add(sqlParameterId);
-                    sqlCommand.Parameters.Add(sqlParameter);
-
-                    sqlCommand.ExecuteNonQuery();
-                    sqlTransaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.InnerException);
-                }
+                myContext.Employees.Add(employee);
+                var result = myContext.SaveChanges();
+                if (result > 0)
+                    return RedirectToAction("Index");
             }
-            return RedirectToAction(nameof(Index));
+            return View();
         }
 
         //UPDATE GET
         public IActionResult Edit(int Id, string FirstName)
         {
-            string query = "select * from employees where EmployeeId = @EmployeeId";
+            //string query = "select * from employees where EmployeeId = @EmployeeId";
 
-            SqlParameter sqlParameterId = new SqlParameter();
-            sqlParameterId.ParameterName = "@EmployeeId";
-            sqlParameterId.Value = Id;
+            //SqlParameter sqlParameterId = new SqlParameter();
+            //sqlParameterId.ParameterName = "@EmployeeId";
+            //sqlParameterId.Value = Id;
 
-            sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            sqlCommand.Parameters.Add(sqlParameterId);
+            //sqlConnection = new SqlConnection(connectionString);
+            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
+            //sqlCommand.Parameters.Add(sqlParameterId);
 
-            try
-            {
-                sqlConnection.Open();
-                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-                {
-                    if (sqlDataReader.HasRows)
-                    {
-                        while (sqlDataReader.Read())
-                        {
-                            ViewData["EmployeeId"] = sqlDataReader[0];
-                            ViewData["FirstName"] = sqlDataReader[1];
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No Data Rows");
-                    }
-                    sqlDataReader.Close();
-                }
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException);
-            }
+            //try
+            //{
+            //    sqlConnection.Open();
+            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+            //    {
+            //        if (sqlDataReader.HasRows)
+            //        {
+            //            while (sqlDataReader.Read())
+            //            {
+            //                ViewData["EmployeeId"] = sqlDataReader[0];
+            //                ViewData["FirstName"] = sqlDataReader[1];
+            //            }
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("No Data Rows");
+            //        }
+            //        sqlDataReader.Close();
+            //    }
+            //    sqlConnection.Close();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.InnerException);
+            //}
             return View();
         }
 
@@ -208,79 +158,79 @@ namespace DTCMCC_WebApp_Sam.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Employee employee)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                sqlConnection.Open();
-                SqlTransaction sqlTransaction = sqlConnection.BeginTransaction();
+            //using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            //{
+            //    sqlConnection.Open();
+            //    SqlTransaction sqlTransaction = sqlConnection.BeginTransaction();
 
-                SqlCommand sqlCommand = sqlConnection.CreateCommand();
-                sqlCommand.Transaction = sqlTransaction;
+            //    SqlCommand sqlCommand = sqlConnection.CreateCommand();
+            //    sqlCommand.Transaction = sqlTransaction;
 
-                try
-                {
-                    sqlCommand.CommandText = "update Employees " +
-                        "set FirstName = @FirstName where EmployeeId = @EmployeeId";
+            //    try
+            //    {
+            //        sqlCommand.CommandText = "update Employees " +
+            //            "set FirstName = @FirstName where EmployeeId = @EmployeeId";
 
-                    SqlParameter sqlParameterId = new SqlParameter();
-                    sqlParameterId.ParameterName = "@EmployeeId";
-                    sqlParameterId.Value = employee.EmployeeId;
+            //        SqlParameter sqlParameterId = new SqlParameter();
+            //        sqlParameterId.ParameterName = "@EmployeeId";
+            //        sqlParameterId.Value = employee.EmployeeId;
 
-                    SqlParameter sqlParameter = new SqlParameter();
-                    sqlParameter.ParameterName = "@FirstName";
-                    sqlParameter.Value = employee.FirstName;
+            //        SqlParameter sqlParameter = new SqlParameter();
+            //        sqlParameter.ParameterName = "@FirstName";
+            //        sqlParameter.Value = employee.FirstName;
 
-                    sqlCommand.Parameters.Add(sqlParameterId);
-                    sqlCommand.Parameters.Add(sqlParameter);
+            //        sqlCommand.Parameters.Add(sqlParameterId);
+            //        sqlCommand.Parameters.Add(sqlParameter);
 
-                    sqlCommand.ExecuteNonQuery();
-                    sqlTransaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.InnerException);
-                }
-            }
+            //        sqlCommand.ExecuteNonQuery();
+            //        sqlTransaction.Commit();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine(ex.InnerException);
+            //    }
+            //}
             return RedirectToAction(nameof(Index));
         }
 
         //Delete
         public IActionResult Delete(int? Id, bool? saveChangesError = false)
         {
-            string query = "select * from employees where EmployeeId = @EmployeeId";
+            //string query = "select * from employees where EmployeeId = @EmployeeId";
 
-            SqlParameter sqlParameter = new SqlParameter();
-            sqlParameter.ParameterName = "@EmployeeId";
-            sqlParameter.Value = Id;
+            //SqlParameter sqlParameter = new SqlParameter();
+            //sqlParameter.ParameterName = "@EmployeeId";
+            //sqlParameter.Value = Id;
 
-            sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            sqlCommand.Parameters.Add(sqlParameter);
+            //sqlConnection = new SqlConnection(connectionString);
+            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
+            //sqlCommand.Parameters.Add(sqlParameter);
 
-            try
-            {
-                sqlConnection.Open();
-                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-                {
-                    if (sqlDataReader.HasRows)
-                    {
-                        while (sqlDataReader.Read())
-                        {
-                            ViewData["EmployeeId"] = sqlDataReader[0];
-                            ViewData["FirstName"] = sqlDataReader[1];
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No Data Rows");
-                    }
-                    sqlDataReader.Close();
-                }
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException);
-            }
+            //try
+            //{
+            //    sqlConnection.Open();
+            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+            //    {
+            //        if (sqlDataReader.HasRows)
+            //        {
+            //            while (sqlDataReader.Read())
+            //            {
+            //                ViewData["EmployeeId"] = sqlDataReader[0];
+            //                ViewData["FirstName"] = sqlDataReader[1];
+            //            }
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("No Data Rows");
+            //        }
+            //        sqlDataReader.Close();
+            //    }
+            //    sqlConnection.Close();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.InnerException);
+            //}
 
             return View();
         }
@@ -289,25 +239,25 @@ namespace DTCMCC_WebApp_Sam.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int Id)
         {
-            string query = "delete from employees where EmployeeId = @EmployeeId";
+            //string query = "delete from employees where EmployeeId = @EmployeeId";
 
-            SqlParameter sqlParameter = new SqlParameter();
-            sqlParameter.ParameterName = "@EmployeeId";
-            sqlParameter.Value = Id;
+            //SqlParameter sqlParameter = new SqlParameter();
+            //sqlParameter.ParameterName = "@EmployeeId";
+            //sqlParameter.Value = Id;
 
-            sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            sqlCommand.Parameters.Add(sqlParameter);
-            try
-            {
-                sqlConnection.Open();
-                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException);
-            }
+            //sqlConnection = new SqlConnection(connectionString);
+            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
+            //sqlCommand.Parameters.Add(sqlParameter);
+            //try
+            //{
+            //    sqlConnection.Open();
+            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+            //    sqlConnection.Close();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.InnerException);
+            //}
             return RedirectToAction(nameof(Index));
         }
 
