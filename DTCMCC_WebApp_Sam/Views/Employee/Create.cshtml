@@ -1,4 +1,4 @@
-﻿@model DTCMCC_WebApp_Sam.Models.Employee
+﻿@model DTCMCC_WebApp_Sam.ViewModel.CreateViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -13,19 +13,17 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <label asp-for="@Model.Employee.FirstName" class="control-label"></label>
+                <input asp-for="@Model.Employee.FirstName" class="form-control" />
+                <span asp-validation-for="@Model.Employee.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="DepartmentId" class="control-label"></label>
-                <select asp-for="DepartmentId" class ="form-control" asp-items=@ViewBag.DepartmentId>
-                    <option disabled selected>--- SELECT ---</option>
-                </select>
+                <label asp-for="@Model.Employee.DepartmentId" class="control-label"></label>
+                <select asp-for="@Model.Employee.DepartmentId" class ="form-control" asp-items="@Model.Departments"></select>
             </div>
             <div class="form-group">
-                <label asp-for="JobsId" class="control-label"></label>
-                <select asp-for="JobsId" class ="form-control" asp-items=@ViewBag.JobsId></select>
+                <label asp-for="@Model.Employee.JobsId" class="control-label"></label>
+                <select asp-for="@Model.Employee.JobsId" class ="form-control" asp-items="@Model.Jobs"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

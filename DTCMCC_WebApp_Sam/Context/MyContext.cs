@@ -9,7 +9,6 @@ namespace DTCMCC_WebApp_Sam.Context
         {
 
         }
-
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Jobs> Jobs  { get; set; }

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,11 +11,13 @@ namespace DTCMCC_WebApp_Sam.Models
     
         [Key]
         public int EmployeeId { get; set; }
-
+        [Required]
         public string FirstName { get; set; }
         public Department Department { get; set; }
         [ForeignKey("Department")]
         public int DepartmentId { get; set; }
+       
+        
 
         public Jobs Jobs { get; set; }
         [ForeignKey("Jobs")]

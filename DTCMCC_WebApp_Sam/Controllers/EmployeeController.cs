@@ -5,12 +5,17 @@ using System;
 using DTCMCC_WebApp_Sam.Context;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using DTCMCC_WebApp_Sam.ViewModel;
+using System.Collections.Generic;
 
 namespace DTCMCC_WebApp_Sam.Controllers
 {
     public class EmployeeController : Controller
     {
         MyContext myContext;
+        
+
         public EmployeeController( MyContext myContext)
         {
             this.myContext = myContext;
@@ -25,75 +30,40 @@ namespace DTCMCC_WebApp_Sam.Controllers
 
         //Read By ID
         //GET
-        public IActionResult Details(int Id, string FirstName)
+        public IActionResult Details(int? id)
         {
-            //string query = "select * from employees where EmployeeId = @EmployeeId";
-
-            //SqlParameter sqlParameter = new SqlParameter();
-            //sqlParameter.ParameterName = "@EmployeeId";
-            //sqlParameter.Value = Id;
-
-            //sqlConnection = new SqlConnection(connectionString);
-            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            //sqlCommand.Parameters.Add(sqlParameter);
-
-            //try
-            //{
-            //    sqlConnection.Open();
-            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-            //    {
-            //        if (sqlDataReader.HasRows)
-            //        {
-            //            while (sqlDataReader.Read())
-            //            {
-            //                ViewData["EmployeeId"] = sqlDataReader[0];
-            //                ViewData["FirstName"] = sqlDataReader[1];
-            //            }
-            //        }
-            //        else
-            //        {
-            //            Console.WriteLine("No Data Rows");
-            //        }
-            //        sqlDataReader.Close();
-            //    }
-            //    sqlConnection.Close();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.InnerException);
-            //}
-
-            return View();
+            
+            Employee employee = myContext.Employees.Find(id);
+            
+            return View(employee);
         }
-
 
         //GET CREATE
         public IActionResult Create()
         {
-           
-            //string data_length = "SELECT COUNT(EmployeeId) FROM Employees";
-            //int count = 0;
+            CreateViewModel createViewModel = new CreateViewModel();
+            createViewModel.Employee = new Employee();
+            List<SelectListItem> departments = myContext.Departments
+                .OrderBy(n => n.Name)
+                .Select(n => new SelectListItem
+                {
+                    Value = n.DepartmentId.ToString(),
+                    Text = n.Name
+                }).ToList();
+            createViewModel.Departments = departments;
 
-            //using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            //{
-            //    try
-            //    {
-            //        using (SqlCommand dataCount = new SqlCommand(data_length, sqlConnection))
-            //        {
-            //            sqlConnection.Open();
-            //            count = (int)dataCount.ExecuteScalar();
-            //        }
+            createViewModel.Employee = new Employee();
+            List<SelectListItem> jobs = myContext.Jobs
+                .OrderBy(n => n.JobTitle)
+                .Select(n => new SelectListItem
+                {
+                    Value = n.JobtId.ToString(),
+                    Text = n.JobTitle
+                }).ToList();
+            createViewModel.Jobs = jobs;
 
-            //        ViewData["EmployeeId"] = count + 1;
 
-            //        sqlConnection.Close();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine(ex.InnerException);
-            //    }
-            //}
-            return View();
+            return View(createViewModel);
         } 
        
 
@@ -115,6 +85,7 @@ namespace DTCMCC_WebApp_Sam.Controllers
         //UPDATE GET
         public IActionResult Edit(int Id, string FirstName)
         {
+            //myContext.Employees.Update(Employee)
             //string query = "select * from employees where EmployeeId = @EmployeeId";
 
             //SqlParameter sqlParameterId = new SqlParameter();
