@@ -1,6 +1,5 @@
 ﻿using API.Context;
 using API.Models;
-using API.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -9,11 +8,11 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class DepartmentController : ControllerBase
     {
         MyContext myContext;
 
-        public EmployeeController(MyContext myContext)
+        public DepartmentController(MyContext myContext)
         {
             this.myContext = myContext;
         }
@@ -22,11 +21,9 @@ namespace API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            //EmployeeDetailViewModel viewModel = new EmployeeDetailViewModel();
-
-            var data = myContext.Employees.ToList();
+            var data = myContext.Departments.ToList();
             if (data.Count == 0)
-                return Ok(new { message = "Data yang anda ambil TIDAK ADA", statusCode = 200, data = data });
+                return Ok(new { message = "Data yang ada minta Tidak Ada", statusCode = 200, data = data });
             return Ok(new { message = "Sukses mengambil data", statusCode = 200, data = data });
         }
 
@@ -34,7 +31,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var data = myContext.Employees.Find(id);
+            var data = myContext.Departments.Find(id);
             if (data == null)
                 return Ok(new { message = "Data yang anda ambil TIDAK ADA", statusCode = 200, data = data });
             return Ok(new { message = "Sukses mengambil data", statusCode = 200, data = data });
@@ -42,25 +39,23 @@ namespace API.Controllers
 
         //UPDATE
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Employee employee)
+        public IActionResult Put(int id, Department department)
         {
-            var data = myContext.Employees.Find(id);
-            data.FirstName = employee.FirstName;
-            data.JobsId = employee.JobsId;
-            data.DepartmentId = employee.DepartmentId;
+            var data = myContext.Departments.Find(id);
+            data.Name = department.Name;
 
-            myContext.Employees.Update(data);
+            myContext.Departments.Update(data);
             var result = myContext.SaveChanges();
             if (result > 0)
-                return Ok(new { message = "Berhasil mengambil data", statusCode = 200 });
-            return BadRequest(new { messagae = "Gagal mengambil data", statusCode = 400 });
+                return Ok(new { message = "Berhasil mengubah data", statusCode = 200 });
+            return BadRequest(new { messagae = "Gagal mengubah data", statusCode = 400 });
         }
 
         //CREATE
         [HttpPost]
-        public IActionResult Post(Employee employee)
+        public IActionResult Post(Department department)
         {
-            myContext.Employees.Add(employee);
+            myContext.Departments.Add(department);
             var result = myContext.SaveChanges();
             if (result > 0)
                 return Ok(new { message = "Berhasil menambahkan data", statusCode = 200 });
@@ -71,12 +66,13 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var data = myContext.Employees.Find(id);
-            myContext.Employees.Remove(data);
+            var data = myContext.Departments.Find(id);
+            myContext.Departments.Remove(data);
             var result = myContext.SaveChanges();
             if (result > 0)
-                return Ok(new { message = "Berhasiil menghapus data", statusCode = 200});
-            return Ok(new { message = "Gagal menghapus data", statusCode = 200});
+                return Ok(new { message = "Berhasiil menghapus data", statusCode = 200 });
+            return Ok(new { message = "Gagal menghapus data", statusCode = 200 });
         }
+
     }
 }

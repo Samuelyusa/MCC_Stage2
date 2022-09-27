@@ -1,21 +1,24 @@
-﻿using System.ComponentModel;
+﻿using API.Models;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Models
+namespace API.ViewModel
 {
-    public class Employee
+    public class UpdateViewModel
     {
         [Key]
         public int EmployeeId { get; set; }
         [Required]
-        [DisplayName("First Name")]
+        
         public string FirstName { get; set; }
-        public Department Department { get; set; }
-        [ForeignKey("Department")]
+
+        //public Department Department { get; set; }
+        
         public int DepartmentId { get; set; }
-        public Jobs Jobs { get; set; }
-        [ForeignKey("Jobs")]
+
+        //public Jobs Jobs { get; set; }
+        
         public int JobsId { get; set; }
     }
 }
