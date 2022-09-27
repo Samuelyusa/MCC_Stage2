@@ -80,8 +80,7 @@ namespace DTCMCC_WebApp_Sam.Controllers
         [HttpGet]
         public IActionResult Details(int? id)
         {
-            //Employee employee = myContext.Employees.Find(id);
-            var employee = myContext.Employees.FirstOrDefault(x => x.EmployeeId == id);
+            var employee = myContext.Employees.Where(x => x.EmployeeId == id).Include(x=> x.Department).Include(x=> x.Jobs).FirstOrDefault();
 
             return View(employee);
         }
@@ -89,15 +88,10 @@ namespace DTCMCC_WebApp_Sam.Controllers
         //UPDATE GET
         public IActionResult Edit(int id)
         {
-            var employee = myContext.Employees.FirstOrDefault(x => x.EmployeeId == id);
             
             CreateViewModel createViewModel = new CreateViewModel();
-            
-            createViewModel.Employee = new Employee();
 
-            createViewModel.Employee.FirstName = employee.FirstName;
-            createViewModel.Employee.DepartmentId = employee.DepartmentId;
-            createViewModel.Employee.JobsId = employee.JobsId;
+            createViewModel.Employee = myContext.Employees.Where(x => x.EmployeeId == id).FirstOrDefault();
 
             List<SelectListItem> departments = myContext.Departments
                 .OrderBy(n => n.Name)
@@ -108,7 +102,6 @@ namespace DTCMCC_WebApp_Sam.Controllers
                 }).ToList();
             createViewModel.Departments = departments;
 
-            //createViewModel.Employee = new Employee();
             List<SelectListItem> jobs = myContext.Jobs
                 .OrderBy(n => n.JobTitle)
                 .Select(n => new SelectListItem
@@ -121,7 +114,8 @@ namespace DTCMCC_WebApp_Sam.Controllers
             return View(createViewModel);
         }
 
-        //UPDATE POST
+        //UPDATE
+        //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Employee employee)
@@ -133,14 +127,14 @@ namespace DTCMCC_WebApp_Sam.Controllers
                 if (result > 0)
                     return RedirectToAction("Index");
             }
-            return View(employee);
+            return RedirectToAction("Index");
         }
 
+        //DELETE
+        //GET
         public IActionResult Delete(int? id, bool? saveChangesError = false)
         {
-            var employee = myContext.Employees
-                .AsNoTracking()
-                .FirstOrDefault(m => m.EmployeeId == id);
+            var employee = myContext.Employees.Where(x => x.EmployeeId == id).Include(x => x.Department).Include(x => x.Jobs).FirstOrDefault();
             if (employee == null)
             {
                 return NotFound();

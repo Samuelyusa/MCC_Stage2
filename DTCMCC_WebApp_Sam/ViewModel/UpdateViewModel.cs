@@ -9,8 +9,8 @@ namespace DTCMCC_WebApp_Sam.ViewModel
         public int EmployeeId { get; set; }
         public string FirstName { get; set; }
         //public IEnumerable<SelectListItem> Departments { get; set; }
-        public Department DepartmentId { get; set; }
+        public int DepartmentId { get; set; }
         //public IEnumerable<SelectListItem> Jobs { get; set; }
-        public Jobs JobsId { get; set; }
+        public int JobsId { get; set; }
     }
 }
