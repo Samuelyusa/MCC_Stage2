@@ -10,15 +10,30 @@
 <div>
     <h4>Employee</h4>
     <hr />
-    <p>@Html.DisplayNameFor(model => model.EmployeeId) : <strong>@ViewData["EmployeeId"]</strong></p>
-    <p>@Html.DisplayNameFor(model => model.FirstName) : <strong>@ViewData["FirstName"]</strong></p>
-
-    <form asp-action="DELETE">
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Department)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DepartmentId)
+        </dd class>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Jobs)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JobsId)
+        </dd class>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="EmployeeId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-    </form>
-
-    <div>
         <a asp-action="Index">Back to List</a>
-    </div>
-
+    </form>
 </div>

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DTCMCC_WebApp_Sam.ViewModel;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DTCMCC_WebApp_Sam.Controllers
 {
@@ -22,22 +23,14 @@ namespace DTCMCC_WebApp_Sam.Controllers
         }
 
         //Read
+        [HttpGet]
         public IActionResult Index()
         {
             var data = myContext.Employees.Include(x => x.Department).Include(y => y.Jobs).ToList();
             return View(data);
         }
 
-        //Read By ID
-        //GET
-        public IActionResult Details(int? id)
-        {
-            
-            Employee employee = myContext.Employees.Find(id);
-            
-            return View(employee);
-        }
-
+        [HttpGet]
         //GET CREATE
         public IActionResult Create()
         {
@@ -82,46 +75,50 @@ namespace DTCMCC_WebApp_Sam.Controllers
             return View();
         }
 
-        //UPDATE GET
-        public IActionResult Edit(int Id, string FirstName)
+        //Read By ID
+        //GET
+        [HttpGet]
+        public IActionResult Details(int? id)
         {
-            //myContext.Employees.Update(Employee)
-            //string query = "select * from employees where EmployeeId = @EmployeeId";
+            //Employee employee = myContext.Employees.Find(id);
+            var employee = myContext.Employees.FirstOrDefault(x => x.EmployeeId == id);
 
-            //SqlParameter sqlParameterId = new SqlParameter();
-            //sqlParameterId.ParameterName = "@EmployeeId";
-            //sqlParameterId.Value = Id;
+            return View(employee);
+        }
 
-            //sqlConnection = new SqlConnection(connectionString);
-            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            //sqlCommand.Parameters.Add(sqlParameterId);
+        //UPDATE GET
+        public IActionResult Edit(int id)
+        {
+            var employee = myContext.Employees.FirstOrDefault(x => x.EmployeeId == id);
+            
+            CreateViewModel createViewModel = new CreateViewModel();
+            
+            createViewModel.Employee = new Employee();
 
-            //try
-            //{
-            //    sqlConnection.Open();
-            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-            //    {
-            //        if (sqlDataReader.HasRows)
-            //        {
-            //            while (sqlDataReader.Read())
-            //            {
-            //                ViewData["EmployeeId"] = sqlDataReader[0];
-            //                ViewData["FirstName"] = sqlDataReader[1];
-            //            }
-            //        }
-            //        else
-            //        {
-            //            Console.WriteLine("No Data Rows");
-            //        }
-            //        sqlDataReader.Close();
-            //    }
-            //    sqlConnection.Close();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.InnerException);
-            //}
-            return View();
+            createViewModel.Employee.FirstName = employee.FirstName;
+            createViewModel.Employee.DepartmentId = employee.DepartmentId;
+            createViewModel.Employee.JobsId = employee.JobsId;
+
+            List<SelectListItem> departments = myContext.Departments
+                .OrderBy(n => n.Name)
+                .Select(n => new SelectListItem
+                {
+                    Value = n.DepartmentId.ToString(),
+                    Text = n.Name
+                }).ToList();
+            createViewModel.Departments = departments;
+
+            //createViewModel.Employee = new Employee();
+            List<SelectListItem> jobs = myContext.Jobs
+                .OrderBy(n => n.JobTitle)
+                .Select(n => new SelectListItem
+                {
+                    Value = n.JobtId.ToString(),
+                    Text = n.JobTitle
+                }).ToList();
+            createViewModel.Jobs = jobs;
+
+            return View(createViewModel);
         }
 
         //UPDATE POST
@@ -129,106 +126,57 @@ namespace DTCMCC_WebApp_Sam.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Employee employee)
         {
-            //using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            //{
-            //    sqlConnection.Open();
-            //    SqlTransaction sqlTransaction = sqlConnection.BeginTransaction();
-
-            //    SqlCommand sqlCommand = sqlConnection.CreateCommand();
-            //    sqlCommand.Transaction = sqlTransaction;
-
-            //    try
-            //    {
-            //        sqlCommand.CommandText = "update Employees " +
-            //            "set FirstName = @FirstName where EmployeeId = @EmployeeId";
-
-            //        SqlParameter sqlParameterId = new SqlParameter();
-            //        sqlParameterId.ParameterName = "@EmployeeId";
-            //        sqlParameterId.Value = employee.EmployeeId;
-
-            //        SqlParameter sqlParameter = new SqlParameter();
-            //        sqlParameter.ParameterName = "@FirstName";
-            //        sqlParameter.Value = employee.FirstName;
-
-            //        sqlCommand.Parameters.Add(sqlParameterId);
-            //        sqlCommand.Parameters.Add(sqlParameter);
-
-            //        sqlCommand.ExecuteNonQuery();
-            //        sqlTransaction.Commit();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine(ex.InnerException);
-            //    }
-            //}
-            return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                myContext.Employees.Update(employee);
+                var result = myContext.SaveChanges();
+                if (result > 0)
+                    return RedirectToAction("Index");
+            }
+            return View(employee);
         }
 
-        //Delete
-        public IActionResult Delete(int? Id, bool? saveChangesError = false)
+        public IActionResult Delete(int? id, bool? saveChangesError = false)
         {
-            //string query = "select * from employees where EmployeeId = @EmployeeId";
+            var employee = myContext.Employees
+                .AsNoTracking()
+                .FirstOrDefault(m => m.EmployeeId == id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
 
-            //SqlParameter sqlParameter = new SqlParameter();
-            //sqlParameter.ParameterName = "@EmployeeId";
-            //sqlParameter.Value = Id;
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "Delete failed. Try again, and if the problem persists " +
+                    "see your system administrator.";
+            }
 
-            //sqlConnection = new SqlConnection(connectionString);
-            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            //sqlCommand.Parameters.Add(sqlParameter);
-
-            //try
-            //{
-            //    sqlConnection.Open();
-            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-            //    {
-            //        if (sqlDataReader.HasRows)
-            //        {
-            //            while (sqlDataReader.Read())
-            //            {
-            //                ViewData["EmployeeId"] = sqlDataReader[0];
-            //                ViewData["FirstName"] = sqlDataReader[1];
-            //            }
-            //        }
-            //        else
-            //        {
-            //            Console.WriteLine("No Data Rows");
-            //        }
-            //        sqlDataReader.Close();
-            //    }
-            //    sqlConnection.Close();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.InnerException);
-            //}
-
-            return View();
+            return View(employee);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int Id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            //string query = "delete from employees where EmployeeId = @EmployeeId";
+            var employee = myContext.Employees.Find(id);
+            if (employee == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
-            //SqlParameter sqlParameter = new SqlParameter();
-            //sqlParameter.ParameterName = "@EmployeeId";
-            //sqlParameter.Value = Id;
-
-            //sqlConnection = new SqlConnection(connectionString);
-            //SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-            //sqlCommand.Parameters.Add(sqlParameter);
-            //try
-            //{
-            //    sqlConnection.Open();
-            //    using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
-            //    sqlConnection.Close();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.InnerException);
-            //}
+            try
+            {
+                myContext.Employees.Remove(employee);
+                myContext.SaveChanges();
+                
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.)
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,4 +1,4 @@
-﻿@model DTCMCC_WebApp_Sam.Models.Employee
+﻿@model DTCMCC_WebApp_Sam.ViewModel.CreateViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,15 +12,21 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="@Model.Employee.EmployeeId" />
             <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <input asp-for="EmployeeId" class="form-control" value="@ViewData["EmployeeId"]"/>
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                <label asp-for="@Model.Employee.FirstName" class="control-label"></label>
+                <input asp-for="@Model.Employee.FirstName" class="form-control" />
+                <span asp-validation-for="@Model.Employee.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" value="@ViewData["FirstName"] ") />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <label asp-for="@Model.Employee.DepartmentId" class="control-label"></label>
+                <select asp-for="@Model.Employee.DepartmentId" class="form-control" asp-items="@Model.Departments"></select>
+                <span asp-validation-for="@Model.Employee.DepartmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Employee.JobsId" class="control-label"></label>
+                <select asp-for="@Model.Employee.JobsId" class="form-control" asp-items="@Model.Jobs"></select>
+                <span asp-validation-for="@Model.Employee.JobsId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
