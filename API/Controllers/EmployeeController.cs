@@ -24,6 +24,7 @@ namespace API.Controllers
         public IActionResult Get()
         {
             var data = employeeRepository.Get();
+
             if (data.Count == 0)
                 return Ok(new { message = "Data yang anda ambil TIDAK ADA", statusCode = 200, data = data });
             return Ok(new { message = "Sukses mengambil data", statusCode = 200, data = data});
