@@ -15,11 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Data\" />
-    <Folder Include="Repositories\Interface\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DTCMCC_WebApp_Sam\DTCMCC_WebApp_Sam.csproj" />
   </ItemGroup>
 
