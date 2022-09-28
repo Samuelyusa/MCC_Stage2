@@ -1,6 +1,7 @@
 ﻿using API.Context;
 using API.Models;
 using API.Repositories.Interface;
+using API.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,6 +36,13 @@ namespace API.Repositories.Data
             return data;
         }
 
+        public int Post(Employee employee)
+        {
+            mycontext.Employees.Add(employee);
+            var result = mycontext.SaveChanges();
+            return result;
+        }
+         
         public int Put(Employee employee)
         {
             var data = Get(employee.EmployeeId);
@@ -46,11 +54,5 @@ namespace API.Repositories.Data
             return result;
         }
 
-        public int Post(Employee employee)
-        {
-            mycontext.Employees.Add(employee);
-            var result = mycontext.SaveChanges();
-            return result;
-        }
     }
 }

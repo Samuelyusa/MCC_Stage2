@@ -26,7 +26,7 @@ namespace API.Controllers
             var data = employeeRepository.Get();
             if (data.Count == 0)
                 return Ok(new { message = "Data yang anda ambil TIDAK ADA", statusCode = 200, data = data });
-            return Ok(new { message = "Sukses mengambil data", statusCode = 200, data = data });
+            return Ok(new { message = "Sukses mengambil data", statusCode = 200, data = data});
         }
 
         //READ BY ID
@@ -54,6 +54,7 @@ namespace API.Controllers
         public IActionResult Post(Employee employee)
         {
             var result = employeeRepository.Post(employee);
+
             if (result > 0)
                 return Ok(new { message = "Berhasil menambahkan data", statusCode = 200 });
             return BadRequest(new { messagae = "Gagal menambahkan data", statusCode = 400 });

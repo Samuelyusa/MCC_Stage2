@@ -57,6 +57,7 @@ namespace API
             #region Dependency Injection
 
             services.AddScoped<EmployeeRepository>();
+            services.AddScoped<DepartmentRepository>();
 
             #endregion Dependency Injection
         }

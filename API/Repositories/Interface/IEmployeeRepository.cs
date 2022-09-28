@@ -9,6 +9,7 @@ namespace API.Repositories.Interface
         Employee Get(int id);
 
         int Post(Employee employee);
+        
         int Put(Employee employee);
         int Delete(int id);
     }
