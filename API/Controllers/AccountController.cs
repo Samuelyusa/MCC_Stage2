@@ -39,5 +39,14 @@ namespace API.Controllers
                 return Ok(new { message = "Register Success", statusCode = 200, data = data });
             return BadRequest(new { message = "Register Failed", statusCode = 400 });
         }
+
+        [HttpPost("ForgotPassword")]
+        public IActionResult ForgotPassword(ForgotPassword forgot)
+        {
+            var data = accountRepository.ForgotPassword(forgot);
+            if(data)
+                return Ok(new { message = "Password Changed Successfuly", statusCode = 200, data = data });
+            return BadRequest(new { message = "Password Changed Failed", statusCode = 400 });
+        }
     }
 }

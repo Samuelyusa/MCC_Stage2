@@ -22,19 +22,21 @@ namespace API.Repositories.Data
                 .Include(x => x.User)
                 .Include(x => x.User.Staff)
                 .FirstOrDefault(x =>
-                    x.User.Staff.Email.Equals(login.email) &&
-                    x.User.Password.Equals(login.password));
+                    x.User.Staff.Email.Equals(login.email)); 
 
             if (data != null)
             {
-                ResponseLogin responseLogin = new ResponseLogin();
+                if(ValidatePassword(login.password, data.User.Password))
                 {
-                    responseLogin.Id = data.User.Id;
-                    responseLogin.FullName = data.User.Staff.FullName;
-                    responseLogin.Email = data.User.Staff.Email;
-                    responseLogin.Role = data.Role.Name;
-                };
-                return responseLogin;
+                    ResponseLogin responseLogin = new ResponseLogin();
+                    {
+                        responseLogin.Id = data.User.Id;
+                        responseLogin.FullName = data.User.Staff.FullName;
+                        responseLogin.Email = data.User.Staff.Email;
+                        responseLogin.Role = data.Role.Name;
+                    };
+                    return responseLogin;
+                }
             }
             return null;
         }
@@ -51,7 +53,6 @@ namespace API.Repositories.Data
 
             if (mycontext.SaveChanges() > 0)
             {
-                //var staffRegister = mycontext.Staff.FirstOrDefault(x => x.Email.Equals(register.Email));
                 var staffRegister = mycontext.Staff.Where(x => x.Email == register.Email).FirstOrDefault();
                 mycontext.User.Add(new User()
                 {
@@ -76,12 +77,38 @@ namespace API.Repositories.Data
                             FullName = staffRegister.FullName,
                             Email = staffRegister.Email,
                             Password = register.password,
+                            RoleId = register.RoleId
                         };
                         return response;
                     }
                 }
             }
             return null;
+        }
+
+        public bool ForgotPassword(ForgotPassword forgotPassword)
+        {
+            var data = mycontext.Staff.Where(x => x.Email.Equals(forgotPassword.Email) &&
+                        x.FullName.Equals(forgotPassword.FullName)).FirstOrDefault();
+
+            if (data!= null)
+            {
+                var account = mycontext.User.Where(x => x.Id == data.Id).FirstOrDefault();
+                if (account != null)
+                {
+                    if(forgotPassword.NewPassword == forgotPassword.ConfirmNewPassword)
+                    {
+                        account.Password = HashPassword(forgotPassword.NewPassword);
+                        mycontext.User.Update(account);
+
+                        if(mycontext.SaveChanges() > 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public static string GetRandomSalt()
