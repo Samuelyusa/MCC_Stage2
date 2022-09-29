@@ -16,7 +16,7 @@ namespace DTCMCC_WebApp_Sam.Controllers
         string address;
         public AccountController()
         {
-            this.address = "https://localhost:44321/api/Account";
+            this.address = "https://localhost:44321/api/Account/";
             HttpClient = new HttpClient
             {
                 BaseAddress = new Uri(address)
@@ -42,5 +42,21 @@ namespace DTCMCC_WebApp_Sam.Controllers
             }
             return View();
         }
+
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        //public async Task<IActionResult> Register(Register register)
+        //{
+        //    StringContent content = new StringContent(JsonConvert.SerializeObject(register), Encoding.UTF8, "application/json");
+        //    var result = HttpClient.PostAsync(address, content).Result;
+
+        //    return View(); 
+        //}
+
+
+
     }
 }

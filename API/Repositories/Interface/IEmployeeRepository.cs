@@ -1,11 +1,12 @@
 ﻿using API.Models;
+using API.ViewModel;
 using System.Collections.Generic;
 
 namespace API.Repositories.Interface
 {
     public interface IEmployeeRepository
     {
-        List<Employee> Get();
+        List<EmployeeViewModel> Get();
         Employee Get(int id);
 
         int Post(Employee employee);

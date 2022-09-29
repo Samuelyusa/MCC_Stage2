@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,7 +10,7 @@ namespace API.Models
         [Key]
         public int EmployeeId { get; set; }
         [Required]
-        [DisplayName("First Name")]
+        [DisplayName("FirstName")]
         public string FirstName { get; set; }
         public Department Department { get; set; }
         [ForeignKey("Department")]

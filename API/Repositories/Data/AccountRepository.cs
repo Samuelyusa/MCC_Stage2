@@ -1,4 +1,5 @@
 ﻿using API.Context;
+using API.Models;
 using API.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace API.Repositories.Data
                     x.User.Staff.Email.Equals(login.email) &&
                     x.User.Password.Equals(login.password));
 
-            if(data != null)
+            if (data != null)
             {
                 ResponseLogin responseLogin = new ResponseLogin();
                 {
@@ -36,6 +37,64 @@ namespace API.Repositories.Data
                 return responseLogin;
             }
             return null;
+        }
+
+        public ResponseRegister Register(Register register)
+        {
+            Staff staff = new Staff()
+            {
+                FullName = register.FullName,
+                Email = register.Email
+            };
+
+            mycontext.Staff.Add(staff);
+
+            if (mycontext.SaveChanges() > 0)
+            {
+                //var staffRegister = mycontext.Staff.FirstOrDefault(x => x.Email.Equals(register.Email));
+                var staffRegister = mycontext.Staff.Where(x => x.Email == register.Email).FirstOrDefault();
+                mycontext.User.Add(new User()
+                {
+                    Id = staffRegister.Id,
+                    Password = HashPassword(register.password)
+                });
+
+                if (mycontext.SaveChanges() > 0)
+                {
+                    
+                    mycontext.UserRole.Add(new UserRole()
+                    {
+                        UserId = staffRegister.Id,
+                        RoleId = register.RoleId
+                    });
+
+                    if (mycontext.SaveChanges() > 0)
+                    {
+                        ResponseRegister response = new ResponseRegister()
+                        {
+                            Id = staffRegister.Id,
+                            FullName = staffRegister.FullName,
+                            Email = staffRegister.Email,
+                            Password = register.password,
+                        };
+                        return response;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static string GetRandomSalt()
+        {
+            return BCrypt.Net.BCrypt.GenerateSalt(12);
+        }
+        public static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password, GetRandomSalt());
+        }
+        public static bool ValidatePassword(string password, string correctHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, correctHash);
         }
     }
 }

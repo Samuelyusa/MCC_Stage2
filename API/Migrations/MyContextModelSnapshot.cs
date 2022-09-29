@@ -159,7 +159,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.User", b =>
                 {
-                    b.HasOne("API.Models.Employee", "Employee")
+                    b.HasOne("API.Models.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
