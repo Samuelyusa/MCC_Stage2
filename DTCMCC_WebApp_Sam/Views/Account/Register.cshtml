@@ -4,8 +4,36 @@
 @{
 }
 <h1>Register</h1>
+
 <form asp-action="Register">
-    <input name="email" />
-    <input name="password" />
-    <button type="submit">Register</button>
-</form>
+  <div class="mb-3 row">
+    <label for="register" class="col-sm-2 col-form-label">Full Name</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="fullName" id="register" required>
+    </div>
+  </div>
+   <div class="mb-3 row">
+    <label for="register" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="email" id="register" required>
+    </div>
+  </div>
+   <div class="mb-3 row">
+    <label for="register" class="col-sm-2 col-form-label">Password</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" name="password" id="register" required>
+    </div>
+  </div>
+   <div class="mb-3 row">
+    <label for="register" class="col-sm-2 col-form-label">Role Id</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="roleId" id="register" required>
+      <div id="register" class="form-text">*Role Id <strong>1</strong> = Admin Role Id <strong>2</strong> = Member.</div>
+    </div>
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Register</button>
+      <div id="login" class="form-text">Sudah punya akun? <a asp-controller="Account" asp-action="Login">Masuk disini!</a></div>
+  </div>
+
+  </form>

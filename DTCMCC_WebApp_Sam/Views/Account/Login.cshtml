@@ -4,8 +4,24 @@
 @{
 }
 <h1>Login</h1>
+
 <form asp-action="Login">
-    <input name="email" />
-    <input name="password" />
-    <button type="submit">Login</button>
-</form>
+
+   <div class="mb-3 row">
+    <label for="login" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="email" id="login" required>
+    </div>
+  </div>
+   <div class="mb-3 row">
+    <label for="login" class="col-sm-2 col-form-label">Password</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" name="password" id="login" required>
+    </div>
+  </div>
+      <div id="login" class="form-text">Belum punya akun? <a asp-controller="Account" asp-action="Register">Daftar disini!</a></div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Login</button>
+  </div>
+
+  </form>
