@@ -1,0 +1,30 @@
+﻿@model DTCMCC_WebApp_Sam.Models.Staff
+
+@{
+    ViewData["Title"] = "Staff Panel";
+}
+<div>
+    <h1>Welcome @Html.DisplayFor(model=> model.FullName)</h1>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <td scope="col">@Html.DisplayNameFor(model => model.Id)</td>
+      <td >@Html.DisplayFor(model=>model.Id)</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td scope="row">@Html.DisplayNameFor(model => model.FullName)</td>
+      <td >@Html.DisplayFor(model=>model.FullName)</td>
+    </tr>
+    <tr>
+      <td scope="row">@Html.DisplayNameFor(model => model.Email)</td>
+      <td >@Html.DisplayFor(model=>model.Email)</td>
+    </tr>
+    <tr>
+      <td scope="row">Action</td>
+      <td> <a asp-action="RequestCuti" asp-route-id="@Model.Id">Pengajuan Cuti</a></td>
+    </tr>
+  </tbody>
+</table>

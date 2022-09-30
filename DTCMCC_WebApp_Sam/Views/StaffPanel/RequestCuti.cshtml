@@ -1,0 +1,26 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+     ViewData["Title"] = "Ajukan Cuti";
+}
+<div>
+    <h1>Form Pengajuan Cuti</h1>
+</div>
+<form asp-action="RequestCuti">
+  <div class="mb-3">
+    <label for="requestCuti" class="form-label">Staff Id</label>
+    <input type="number" class="form-control" id="requestCuti" aria-describedby="requestCuti" name="StaffId">
+    <div id="requestCuti" class="form-text">Masukkan Staff ID sesuai dengan yang terdaftar.</div>
+  </div>
+  <div class="mb-3">
+    <label for="requestCuti" class="form-label">Lama Cuti</label>
+    <input type="number" class="form-control" id="requestCuti" name="LamaCuti">
+    <div id="requestCuti" class="form-text">Lama Cuti dalam hitungan hari kerja.</div>
+
+  </div>
+  <button type="submit" value="Save" class="btn btn-primary">Ajukan Cuti</button>
+</form>
+<div>
+    <a asp-action="Index">Kembali</a>
+</div>

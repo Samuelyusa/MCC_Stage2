@@ -1,6 +1,7 @@
 ﻿using DTCMCC_WebApp_Sam.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -41,7 +42,13 @@ namespace DTCMCC_WebApp_Sam.Controllers
             {
                 var data = JsonConvert.DeserializeObject<ResponseClient>(await result.Content.ReadAsStringAsync());
                 HttpContext.Session.SetString("Role", data.data.Role);
-                return RedirectToAction("Index", "Home");
+                if (HttpContext.Session.GetString("Role").Equals("Admin"))
+                    return RedirectToAction("Index", "AdminPanel");
+                //RouteValueDictionary dict = new RouteValueDictionary();
+                //dict.Add("LoginStaffId", data.data.Id);
+                var logId = data.data.Id;
+                TempData["logId"] = logId;
+                return RedirectToAction("Index", "StaffPanel");
             }
             return View();
         }
